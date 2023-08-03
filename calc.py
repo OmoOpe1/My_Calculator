@@ -41,7 +41,15 @@ class Calculator:
         self.create_digit_buttons()
         self.create_operator_buttons()
         self.create_special_buttons()
+        self.bind_keys()
 
+    def bind_keys(self):
+        self.window.bind("<Return>", lambda event: self.evaluate())
+        for key in self.digits:
+            self.window.bind(str(key), lambda event, digit=key: self.add_to_expression(digit))
+
+        for key in self.operations:
+            self.window.bind(key, lambda event, operator=key: self.append_operator(operator))
     def create_special_buttons(self):
         self.create_clear_button()
         self.create_equals_button()
@@ -116,14 +124,15 @@ class Calculator:
     def evaluate(self):
         self.total_expression += self.current_expression
         self.update_total_label()
+        try:
 
-        self.current_expression = str(eval(self.total_expression))
+            self.current_expression = str(eval(self.total_expression))
 
-        self.total_expression = ""
-        self.update_label()
-
-
-
+            self.total_expression = ""
+        except Exception as e:
+            self.current_expression = "Error"
+        finally:
+            self.update_label()
 
     def create_equals_button(self):
         button = tk.Button(self.buttons_frame, text="=", bg=LIGHT_BLUE, fg=LABEL_COLOUR, font=DEFAULT_FONT_STYLE, borderwidth=0, command=self.evaluate)
